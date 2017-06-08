@@ -75,6 +75,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+console.log('****xxxxxxxxxx*****************8')
   it('Should respond with messages that were previously posted', function() {
     var stubMsg = {
       username: 'Jono',
@@ -83,8 +84,8 @@ describe('Node Server Request Listener Function', function() {
     var req = new stubs.request('/classes/messages', 'POST', stubMsg);
     var res = new stubs.response();
 
-    handler.requestHandler(req, res);
 
+    handler.requestHandler(req, res);
     expect(res._responseCode).to.equal(201);
 
       // Now if we request the log for that room the message we posted should be there:
@@ -101,6 +102,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+console.log('*************xxxxxxxxxxxxxx********8')
 
   it('Should 404 when asked for a nonexistent file', function() {
     var req = new stubs.request('/arglebargle', 'GET');

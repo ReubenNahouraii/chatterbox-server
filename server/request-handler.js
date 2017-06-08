@@ -9,9 +9,11 @@ You'll have to figure out a way to export this function from
 this file and include it in basic-server.js so that it actually works.
 
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-
+  
 **************************************************************/
 
+var savedData = [];
+   
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -23,27 +25,55 @@ var requestHandler = function(request, response) {
   // http://nodejs.org/documentation/api/
 
   // Do some basic logging.
-  //
-  // Adding more logging to your server can be an easy way to get passive
-  // debugging help, but you should always be careful about leaving stray
-  // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
-  // The outgoing status.
-  var statusCode = 200;
 
-  // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
+  // headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/json';
 
-  // Tell the client we are sending them plain text.
-  //
-  // You will need to change this if you are sending something
-  // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  if (request.url !== '/classes/messages' && request.url !== '/classes/room') {   
+    response.writeHead(404, headers);
+    response.end();
+  }
 
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  var statusCode = 200;
+  if (request.method === 'POST') {
+    statusCode++;
+    response.writeHead(statusCode, headers);
+
+    var body = [];
+    request.on('data', function(chunk) {
+      body.push(chunk);
+    }).on('end', function() {
+      savedData.push(JSON.parse(Buffer.concat(body).toString()));
+      console.log('dfasdfksd',savedData[0])
+      response.end();
+        // at this point, `body` has the entire request body stored in it as a string
+    });
+  } else {
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify({results: savedData}));
+  }
+
+  // //
+  // // adding more logging to your server can be an easy way to get passive
+  // // debugging help, but you should always be careful about leaving stray
+  // // console.logs in your code.
+  // console.log('serving request type ' + request.method + ' for url ' + request.url);
+  // console.log('---------------------------')
+  // console.log('request', request);
+  // console.log('---------------------------')
+  // // the outgoing status.
+
+  // // See the note below about CORS headers.
+
+  // // Tell the client we are sending them plain text.
+  // //
+  // // You will need to change this if you are sending something
+  // // other than plain text, like JSON or HTML.
+
+  // // .writeHead() writes to the request line and headers of the response,
+  // // which includes the status and all headers.
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -52,7 +82,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  // response.end(JSON.stringify({results: body}));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +101,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+exports.requestHandler = requestHandler;
