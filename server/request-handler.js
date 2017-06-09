@@ -13,6 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 var savedData = [];
+var id = 1;
    
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -26,28 +27,43 @@ var requestHandler = function(request, response) {
 
   // Do some basic logging.
 
+console.log('-----------------------------------');
+console.log(request.url);
+console.log('-----------------------------------');
 
   var headers = defaultCorsHeaders;
   // headers['Content-Type'] = 'text/plain';
   headers['Content-Type'] = 'application/json';
 
-  if (request.url !== '/classes/messages' && request.url !== '/classes/room') {   
+  // if (request.url !== '/classes/messages') {   
+  if (!/^\/messages.*/.test(request.url)) {   
     response.writeHead(404, headers);
     response.end();
   }
 
   var statusCode = 200;
-  if (request.method === 'POST') {
+
+  if (request.method === 'OPTIONS') {
+    statusCode = 204;
+    response.writeHead(statusCode, headers);  
+    response.end();  
+  } else if (request.method === 'POST') {
     statusCode++;
     response.writeHead(statusCode, headers);
 
     var body = [];
+    request.setEncoding('utf8');
     request.on('data', function(chunk) {
       body.push(chunk);
+console.log('**********************************');
+      console.log(chunk);
     }).on('end', function() {
-      savedData.push(JSON.parse(Buffer.concat(body).toString()));
-      console.log('dfasdfksd',savedData[0])
-      response.end();
+      // savedData.push(JSON.parse(Buffer.concat(body).toString()));
+      body = body.join('');
+      var bodyParsed = JSON.parse(body);
+      bodyParsed.objectId = id++;
+      savedData.push(bodyParsed);
+      response.end(JSON.stringify({results: savedData}));
         // at this point, `body` has the entire request body stored in it as a string
     });
   } else {

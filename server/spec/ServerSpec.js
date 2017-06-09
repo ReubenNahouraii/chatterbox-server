@@ -75,7 +75,6 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-console.log('****xxxxxxxxxx*****************8')
   it('Should respond with messages that were previously posted', function() {
     var stubMsg = {
       username: 'Jono',
@@ -101,8 +100,6 @@ console.log('****xxxxxxxxxx*****************8')
     expect(messages[0].message).to.equal('Do my bidding!');
     expect(res._ended).to.equal(true);
   });
-
-console.log('*************xxxxxxxxxxxxxx********8')
 
   it('Should 404 when asked for a nonexistent file', function() {
     var req = new stubs.request('/arglebargle', 'GET');

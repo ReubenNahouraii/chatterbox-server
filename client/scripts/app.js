@@ -31,7 +31,7 @@ var app = {
 
     // Poll for new messages
     // setInterval(function() {
-      // app.fetch(true);
+    //   app.fetch(true);
     // }, 3000);
   },
 
@@ -42,8 +42,9 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: message,
+      data: JSON.stringify(message),
       success: function (data) {
+        console.log('post success');
         // Clear messages input
         app.$message.val('');
 
@@ -63,9 +64,12 @@ var app = {
       data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(data) {
-        console.log('success', data);
+        console.log('get success', data);
         // Don't bother if we have nothing to work with
-        if (!data.results || !data.results.length) { return; }
+        if (!data.results || !data.results.length) { 
+          app.stopSpinner();
+          return;
+        }
 
         // Store messages for caching later
         app.messages = data.results;
@@ -97,6 +101,7 @@ var app = {
   },
 
   renderMessages: function(messages, animate) {
+    debugger;
     // Clear existing messages`
     app.clearMessages();
     app.stopSpinner();
